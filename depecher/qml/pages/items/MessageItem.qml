@@ -243,9 +243,14 @@ ListItem {
                         else if(message_type == MessagingModel.AUDIO) {
                             return "delegates/AudioDelegate.qml"
                         }
-
                         else if(message_type == MessagingModel.VOICE) {
                             return "delegates/VoiceNoteDelegate.qml"
+                        }
+                        else if(message_type == MessagingModel.VIDEO) {
+                            return "delegates/VideoDelegate.qml"
+                        }
+                        else if(message_type == MessagingModel.VIDEONOTE) {
+                            return "delegates/VideoNoteDelegate.qml"
                         }
                         else if(message_type == MessagingModel.CONTACT) {
                             return "delegates/ContactDelegate.qml"
