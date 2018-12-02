@@ -683,6 +683,10 @@ QSharedPointer<MessageContent> ParseObject::parseMessageContent(const QJsonObjec
         return parseMessageVoiceNote(messageContentObject);
     if (messageContentObject["@type"].toString() == "messageAudio")
         return parseMessageAudio(messageContentObject);
+    if (messageContentObject["@type"].toString() == "messageVideo")
+        return parseMessageVideo(messageContentObject);
+    if (messageContentObject["@type"].toString() == "messageVideoNote")
+        return parseMessageVideoNote(messageContentObject);
     if (messageContentObject["@type"].toString() == "messageContact") {
         if (messageContentObject["@type"].toString() != "messageContact")
             return QSharedPointer<messageContact>(new messageContact);
@@ -1003,6 +1007,52 @@ QSharedPointer<messageAudio> ParseObject::parseMessageAudio(const QJsonObject
     resultAudio->caption_ = parseFormattedTextContent(messageAudioObject["caption"].toObject());
 
     return resultAudio;
+}
+
+QSharedPointer<messageVideo> ParseObject::parseMessageVideo(const QJsonObject
+        &messageVideoObject)
+{
+    if (messageVideoObject["@type"].toString() != "messageVideo")
+        return QSharedPointer<messageVideo>(new messageVideo);
+
+    auto resultVideo = QSharedPointer<messageVideo>(new messageVideo);
+    auto videoObject = messageVideoObject["video"].toObject();
+    resultVideo->video_ = QSharedPointer<video>(new video);
+    resultVideo->video_->duration_ = audioObject["duration"].toInt();
+    resultVideo->video_->width_= videoObject["width"].toInt();
+    resultVideo->video_->height_= videoObject["height"].toInt();
+    resultVideo->video_->file_name_ = videoObject["file_name"].toString().toStdString();
+    resultVideo->video_->mime_type_ = videoObject["mime_type"].toString().toStdString();
+    resultVideo->video_->has_stickers_ = videoObject["has_stickers"].toBool();
+    resultVideo->video_->supports_streaming_ = videoObject["sipports_streaming"].toBool();
+    resultVideo->video_->thumbnail = parsePhotoSize(videoObject["thumbnail"].toObject());
+    resultVideo->video_->video_ = parseFile(videoObject["video"].toObject());
+
+    resultVideo->caption_ = parseFormattedTextContent(messageVideoObject["caption"].toObject());
+    resultVideo->is_secret_ = videoObject["is_secret"].toBool();
+
+    return resultVideo;
+}
+
+QSharedPointer<messageVideoNote> ParseObject::parseMessageVideoNote(const QJsonObject
+        &messageVideoNoteObject)
+{
+    if (messageVideoNoteObject["@type"].toString() != "messageVideoNote")
+        return QSharedPointer<messageVideoNote>(new messageVideoNote);
+
+    auto resultVideoNote = QSharedPointer<messageVideoNote>(new messageVideoNote);
+
+    auto videoNoteObject = messageVideoNoteObject["video_note"].toObject();
+    resultVideoNote->video_note_ = QSharedPointer<videoNote>(new videoNote);
+    resultVideoNote->video_note_->duration_ = videoNoteObject["duration"].toInt();
+    resultVideoNote->video_note_->length_ = videoNoteObject["length"].toInt();
+    resultVideoNote->video_note_->thumbnail = parsePhotoSize(videoNoteObject["thumbnail"].toObject());
+    resultVideoNote->video_note_->video_ = parseFile(videoNoteObject["video"].toObject());
+
+    resultVideoNote->is_viewed_ = videoNoteObject["is_viewed_"].toBool();
+    resultVideoNote->is_secret_ = videoNoteObject["is_secret"].toBool();
+
+    return resultVoiceNote;
 }
 
 QSharedPointer<messageSticker> ParseObject::parseMessageSticker(const QJsonObject
